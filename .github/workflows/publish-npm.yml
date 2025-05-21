@@ -22,17 +22,6 @@ jobs:
         with:
           version: latest
 
-      - name: Get tag name
-        id: get_tag
-        run: echo "tag=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
-
-      - name: Extract version from tag
-        id: extract_version
-        run: |
-          VERSION="${{ steps.get_tag.outputs.tag }}"
-          VERSION="${VERSION#v}"
-          echo "version=${VERSION}" >> $GITHUB_OUTPUT
-
       - name: Install dependencies
         run: pnpm install
         working-directory: ./clients/js
@@ -41,10 +30,6 @@ jobs:
 
       - name: Build package
         run: pnpm build
-        working-directory: ./clients/js
-
-      - name: Set version from tag
-        run: pnpm version ${{ steps.extract_version.outputs.version }} --no-git-tag-version
         working-directory: ./clients/js
 
       - name: Publish to NPM
