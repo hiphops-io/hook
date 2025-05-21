@@ -14,7 +14,8 @@
   },
   "files": [
     "dist",
-    "bin"
+    "bin",
+    "scripts/install.js"
   ],
   "scripts": {
     "build": "tsup",
