@@ -2,7 +2,7 @@ import { spawn, ChildProcess } from "child_process";
 import * as fs from "fs";
 import * as path from "path";
 import * as os from "os";
-import { fileURLToPath } from "url";
+import { URL } from "url";
 
 // Constants
 const SOCKET_PATH = "/tmp/hiphops.sock";
@@ -15,19 +15,10 @@ export interface LicenseInfo {
   [key: string]: any;
 }
 
-// Helper to determine if we're in ESM context
-const isESM = typeof import.meta !== "undefined";
-
 // Get the directory of the current module
 const getModuleDir = () => {
-  if (isESM) {
-    // ESM context
-    const __filename = fileURLToPath(import.meta.url);
-    return path.dirname(path.dirname(__filename));
-  } else {
-    // CJS context
-    return path.dirname(__dirname);
-  }
+  const __filename = new URL("", import.meta.url).pathname;
+  return path.dirname(path.dirname(__filename));
 };
 
 // Helper to determine the binary path
