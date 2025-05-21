@@ -12,7 +12,7 @@ VERSION=$1
 TAG_NAME="v$VERSION"
 
 # Validate semantic version format
-if ! [[ $VERSION =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[a-zA-Z0-9\.]+)?$ ]]; then
+if ! [[ $VERSION =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[a-zA-Z0-9_]+)?$ ]]; then
   echo "Error: Version must follow semantic versioning (e.g., 1.2.3 or 1.2.3-beta1)"
   exit 1
 fi
@@ -34,20 +34,15 @@ fi
 echo "Pulling latest changes from main..."
 git pull origin main
 
-# Update go.mod
-echo "Updating go.mod with version $VERSION..."
-# Get the current module path from go.mod
-MODULE_PATH=$(grep -m 1 "module" go.mod | awk '{print $2}')
-sed -i.bak "1,/module/ s|module $MODULE_PATH|module $MODULE_PATH/v$VERSION|" go.mod && rm go.mod.bak || true
-
 # Build to ensure everything compiles
 echo "Building to verify code..."
 go build ./...
 
 # Commit the version change
-echo "Committing version update..."
-git add go.mod
-git commit -m "chore: release version $VERSION"
+# Commented out as we do not make any code changes in this script atm
+# echo "Committing version update..."
+# git add go.mod
+# git commit -m "chore: release version $VERSION"
 
 # Create and push the tag
 echo "Creating and pushing tag $TAG_NAME..."
