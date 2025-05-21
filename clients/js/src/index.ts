@@ -2,6 +2,8 @@ import { spawn, ChildProcess } from "child_process";
 import * as fs from "fs";
 import * as path from "path";
 import * as os from "os";
+import * as http from "http";
+import * as net from "net";
 import { URL } from "url";
 
 // Constants
@@ -17,8 +19,23 @@ export interface LicenseInfo {
 
 // Get the directory of the current module
 const getModuleDir = () => {
-  const __filename = new URL("", import.meta.url).pathname;
-  return path.dirname(path.dirname(__filename));
+  try {
+    // For ESM
+    if (typeof import.meta !== "undefined" && import.meta.url) {
+      const __filename = new URL("", import.meta.url).pathname;
+      return path.dirname(path.dirname(__filename));
+    }
+  } catch (error) {
+    // Ignore errors
+  }
+
+  // For CommonJS
+  if (typeof __dirname !== "undefined") {
+    return path.dirname(__dirname);
+  }
+
+  // Fallback
+  return path.resolve(".");
 };
 
 // Helper to determine the binary path
@@ -143,15 +160,50 @@ class HookClient {
   private async makeRequest<T>(path: string): Promise<T> {
     await this.ensureServerRunning();
 
-    // Support both Node.js and other environments
-    const fetch = globalThis.fetch || (await import("node-fetch")).default;
+    return new Promise<T>((resolve, reject) => {
+      const options = {
+        socketPath: SOCKET_PATH,
+        path: path,
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      };
 
-    const response = await fetch(`http://unix:${SOCKET_PATH}:${path}`);
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
+      const req = http.request(options, (res) => {
+        let data = "";
 
-    return response.json() as Promise<T>;
+        res.on("data", (chunk) => {
+          data += chunk;
+        });
+
+        res.on("end", () => {
+          try {
+            if (res.statusCode !== 200) {
+              reject(new Error(`HTTP error! status: ${res.statusCode}`));
+              return;
+            }
+
+            const parsedData = JSON.parse(data);
+            resolve(parsedData);
+          } catch (error) {
+            reject(
+              new Error(
+                `Error parsing response: ${
+                  error instanceof Error ? error.message : String(error)
+                }`
+              )
+            );
+          }
+        });
+      });
+
+      req.on("error", (error) => {
+        reject(new Error(`Request error: ${error.message}`));
+      });
+
+      req.end();
+    });
   }
 
   /**
