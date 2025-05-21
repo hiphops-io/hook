@@ -38,11 +38,27 @@ git pull origin main
 echo "Building to verify code..."
 go build ./...
 
+# Update the js package version
+JS_PACKAGE_PATH="$PWD/clients/js/package.json"
+if [ -f "$JS_PACKAGE_PATH" ]; then
+  echo "Updating JavaScript package version to $VERSION..."
+  # Use node to update package.json version
+  node -e "
+    const fs = require('fs');
+    const path = '$JS_PACKAGE_PATH';
+    const pkg = JSON.parse(fs.readFileSync(path));
+    pkg.version = '$VERSION';
+    fs.writeFileSync(path, JSON.stringify(pkg, null, 2) + '\n');
+  "
+  echo "JavaScript package updated to version $VERSION"
+else
+  echo "JavaScript package.json not found at $JS_PACKAGE_PATH, skipping"
+fi
+
 # Commit the version change
-# Commented out as we do not make any code changes in this script atm
-# echo "Committing version update..."
-# git add go.mod
-# git commit -m "chore: release version $VERSION"
+echo "Committing version update..."
+git add clients/js/package.json
+git commit -m "chore: release version $VERSION"
 
 # Create and push the tag
 echo "Creating and pushing tag $TAG_NAME..."
