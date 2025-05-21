@@ -1,4 +1,8 @@
-#!/usconst url = require('url');
+#!/usr/bin/env node
+const fs = require("fs");
+const path = require("path");
+const https = require("https");
+const os = require("os");
 const { execSync } = require("child_process");
 const { createWriteStream, mkdirSync } = require("fs");
 
@@ -16,22 +20,6 @@ if (
   process.env.SKIP_HOOK_DOWNLOAD === "true"
 ) {
   console.log("Skipping hook binary download in development mode");
-  process.exit(0);
-}
-node;
-
-const fs = require("fs");
-const path = require("path");
-const https = require("https");
-const os = require("os");
-const { execSync } = require("child_process");
-const { createWriteStream, mkdirSync } = require("fs");
-
-// Skip binary download if env var is set
-if (process.env.HIPHOPS_HOOK_BIN) {
-  console.log(
-    `Using hook binary from HIPHOPS_HOOK_BIN: ${process.env.HIPHOPS_HOOK_BIN}`
-  );
   process.exit(0);
 }
 
