@@ -12,9 +12,9 @@ VERSION=$1
 TAG_NAME="v$VERSION"
 # Get the root dir so we can move around safely no matter where it was called from
 SCRIPT_DIR=$( dirname $(realpath "$0") )
-ROOT_DIR=$(realpath "$SCRIPT_DIR/../..")
-CURRENT_DIR=$(pwd)
-cd $START_DIR
+ROOT_DIR=$(realpath "$SCRIPT_DIR/..")
+START_DIR=$(pwd)
+cd $ROOT_DIR
 
 # Validate semantic version format
 if ! [[ $VERSION =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[a-zA-Z0-9_]+)?$ ]]; then
