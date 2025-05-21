@@ -32,6 +32,7 @@ jobs:
         with:
           go-version: "1.24.x"
           check-latest: true
+          go-version-file: go.mod
 
       - name: Build binary
         env:
@@ -50,7 +51,6 @@ jobs:
   build-macos:
     name: Build and Sign macOS
     runs-on: macos-latest
-
     strategy:
       matrix:
         include:
@@ -68,6 +68,7 @@ jobs:
         with:
           go-version: "1.24.x"
           check-latest: true
+          go-version-file: go.mod
 
       - name: Build binary
         env:
@@ -139,3 +140,16 @@ jobs:
             hook-windows-amd64.exe/hook-windows-amd64.exe
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Trigger Client Builds
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const tag = context.payload.ref.replace('refs/tags/', '');
+            const response = await github.rest.repos.createWorkflowDispatch({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              workflow_id: 'publish-npm.yml',
+              ref: context.payload.ref
+            });
+            console.log(response);
