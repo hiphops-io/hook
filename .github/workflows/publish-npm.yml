@@ -1,0 +1,57 @@
+name: Publish NPM Package
+
+on:
+  push:
+    tags:
+      - "v*" # Run on any tag that starts with 'v', for semver tags like v1.0.0
+
+jobs:
+  build-and-publish:
+    name: Build and publish NPM package
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18.x"
+          registry-url: "https://registry.npmjs.org"
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: latest
+
+      - name: Get tag name
+        id: get_tag
+        run: echo "tag=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+
+      - name: Extract version from tag
+        id: extract_version
+        run: |
+          VERSION="${{ steps.get_tag.outputs.tag }}"
+          VERSION="${VERSION#v}"
+          echo "version=${VERSION}" >> $GITHUB_OUTPUT
+
+      - name: Install dependencies
+        run: pnpm install
+        working-directory: ./clients/js
+        env:
+          SKIP_HOOK_DOWNLOAD: "true"
+
+      - name: Build package
+        run: pnpm build
+        working-directory: ./clients/js
+
+      - name: Set version from tag
+        run: pnpm version ${{ steps.extract_version.outputs.version }} --no-git-tag-version
+        working-directory: ./clients/js
+
+      - name: Publish to NPM
+        run: pnpm publish --no-git-checks --access public
+        working-directory: ./clients/js
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
