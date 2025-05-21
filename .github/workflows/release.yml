@@ -1,0 +1,85 @@
+name: Release Build
+
+on:
+  push:
+    tags:
+      - "v*" # Run on any tag that starts with 'v', for semver tags like v1.0.0 or v1.0.0-beta1
+
+jobs:
+  build:
+    name: Build and Release
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        include:
+          - os: linux
+            arch: amd64
+            binary_name: hook-linux-amd64
+          - os: linux
+            arch: arm64
+            binary_name: hook-linux-arm64
+          - os: darwin
+            arch: amd64
+            binary_name: hook-darwin-amd64
+          - os: darwin
+            arch: arm64
+            binary_name: hook-darwin-arm64
+          - os: windows
+            arch: amd64
+            binary_name: hook-windows-amd64.exe
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.24.x"
+          check-latest: true
+
+      - name: Build binary
+        env:
+          GOOS: ${{ matrix.os }}
+          GOARCH: ${{ matrix.arch }}
+        run: |
+          go build -ldflags="-s -w" -o ${{ matrix.binary_name }} ./cmd/hook
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.binary_name }}
+          path: ${{ matrix.binary_name }}
+          retention-days: 1
+
+  release:
+    name: Create Release
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+
+      - name: List files
+        run: find . -type f | sort
+
+      - name: Get tag name
+        id: get_tag
+        run: echo "tag=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          name: Release ${{ steps.get_tag.outputs.tag }}
+          draft: false
+          prerelease: ${{ contains(steps.get_tag.outputs.tag, '-') }}
+          files: |
+            hook-linux-amd64/hook-linux-amd64
+            hook-linux-arm64/hook-linux-arm64
+            hook-darwin-amd64/hook-darwin-amd64
+            hook-darwin-arm64/hook-darwin-arm64
+            hook-windows-amd64.exe/hook-windows-amd64.exe
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -19,6 +19,7 @@ const socketPath = "/tmp/hiphops.sock"
 
 func main() {
 	if err := run(); err != nil {
+		// TODO: Better error handling
 		fmt.Printf("Exited due to: %e\n", err)
 		os.Exit(1)
 	}
@@ -29,9 +30,11 @@ func run() error {
 	if err != nil {
 		return err
 	}
+	defer os.Remove(socketPath)
+	defer socket.Close()
 
 	// Pre-warm the license cache
-	license.GetLicenseInfo()
+	license.GetLicenseInfo(true)
 
 	sigChan := make(chan os.Signal, 1)
 	signal.Notify(sigChan, os.Interrupt, syscall.SIGTERM)
@@ -57,19 +60,11 @@ func run() error {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
-	if err := e.Shutdown(ctx); err != nil {
-		return err
-	}
-
-	if err := os.Remove(socketPath); err != nil {
-		return err
-	}
-
-	return nil
+	return e.Shutdown(ctx)
 }
 
 func getLicenseInfo(c echo.Context) error {
-	info := license.GetLicenseInfo()
+	info := license.GetLicenseInfo(false)
 
 	return c.JSON(http.StatusOK, info)
 }

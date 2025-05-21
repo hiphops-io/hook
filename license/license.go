@@ -29,8 +29,8 @@ type (
 var licenseKey []byte
 var _licenseInfo *LicenseInfo
 
-func GetLicenseInfo() (licenseInfo *LicenseInfo) {
-	if _licenseInfo != nil {
+func GetLicenseInfo(force bool) (licenseInfo *LicenseInfo) {
+	if !force && _licenseInfo != nil {
 		licenseInfo = _licenseInfo
 		return
 	}
