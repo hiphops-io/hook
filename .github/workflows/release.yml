@@ -6,8 +6,8 @@ on:
       - "v*" # Run on any tag that starts with 'v', for semver tags like v1.0.0 or v1.0.0-beta1
 
 jobs:
-  build:
-    name: Build and Release
+  build-linux-windows:
+    name: Build Linux/Windows
     runs-on: ubuntu-latest
 
     strategy:
@@ -19,12 +19,6 @@ jobs:
           - os: linux
             arch: arm64
             binary_name: hook-linux-arm64
-          - os: darwin
-            arch: amd64
-            binary_name: hook-darwin-amd64
-          - os: darwin
-            arch: arm64
-            binary_name: hook-darwin-arm64
           - os: windows
             arch: amd64
             binary_name: hook-windows-amd64.exe
@@ -53,9 +47,71 @@ jobs:
           path: ${{ matrix.binary_name }}
           retention-days: 1
 
+  build-macos:
+    name: Build and Sign macOS
+    runs-on: macos-latest
+
+    strategy:
+      matrix:
+        include:
+          - arch: amd64
+            binary_name: hook-darwin-amd64
+          - arch: arm64
+            binary_name: hook-darwin-arm64
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.24.x"
+          check-latest: true
+
+      - name: Build binary
+        env:
+          GOOS: darwin
+          GOARCH: ${{ matrix.arch }}
+        run: |
+          go build -ldflags="-s -w" -o ${{ matrix.binary_name }} ./cmd/hook
+
+      - name: Import Code-Signing Certificates
+        uses: apple-actions/import-codesign-certs@v2
+        with:
+          p12-file-base64: ${{ secrets.APPLE_CODE_SIGNING_CERTIFICATE_P12_BASE64 }}
+          p12-password: ${{ secrets.APPLE_CODE_SIGNING_CERTIFICATE_P12_PASSWORD }}
+          keychain-password: ${{ github.run_id }}
+
+      - name: Sign the macOS binary
+        run: |
+          /usr/bin/codesign --force -s "${{ secrets.APPLE_CODE_SIGNING_DEVELOPER_ID }}" --options runtime ${{ matrix.binary_name }} -v
+
+      - name: Notarize the binary
+        run: |
+          # Create a ZIP file for notarization
+          ditto -c -k --keepParent "${{ matrix.binary_name }}" "${{ matrix.binary_name }}.zip"
+
+          # Notarize the zip
+          xcrun notarytool submit "${{ matrix.binary_name }}.zip" \
+            --apple-id "${{ secrets.APPLE_LOGIN }}" \
+            --password "${{ secrets.APPLE_NOTARYTOOL_PASSWORD }}" \
+            --team-id "${{ secrets.APPLE_TEAM_ID }}" \
+            --wait
+
+          # Unzip the notarized binary
+          ditto -x -k "${{ matrix.binary_name }}.zip" .
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.binary_name }}
+          path: ${{ matrix.binary_name }}
+          retention-days: 1
+
   release:
     name: Create Release
-    needs: build
+    needs: [build-linux-windows, build-macos]
     runs-on: ubuntu-latest
 
     steps:
