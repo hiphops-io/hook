@@ -10,6 +10,11 @@ fi
 
 VERSION=$1
 TAG_NAME="v$VERSION"
+# Get the root dir so we can move around safely no matter where it was called from
+SCRIPT_DIR=$( dirname $(realpath "$0") )
+ROOT_DIR=$(realpath "$SCRIPT_DIR/../..")
+CURRENT_DIR=$(pwd)
+cd $START_DIR
 
 # Validate semantic version format
 if ! [[ $VERSION =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[a-zA-Z0-9_]+)?$ ]]; then
@@ -40,7 +45,9 @@ go build ./...
 
 # Update the js package version
 echo "Updating JavaScript package version to $VERSION..."
+cd clients/js
 pnpm version $VERSION --no-git-tag-version
+cd $ROOT_DIR
 echo "JavaScript package updated to version $VERSION"
 
 # Commit the version change
@@ -57,3 +64,5 @@ git push origin "$TAG_NAME"
 echo "Release $VERSION initiated successfully!"
 echo "GitHub Actions workflow should now start building the release."
 echo "Check the Actions tab in your GitHub repository to monitor progress."
+
+cd $START_DIR
