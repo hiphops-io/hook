@@ -146,7 +146,7 @@ jobs:
         with:
           script: |
             const tag = context.payload.ref.replace('refs/tags/', '');
-            const response = await github.rest.repos.createWorkflowDispatch({
+            const response = await github.rest.actions.createWorkflowDispatch({
               owner: context.repo.owner,
               repo: context.repo.repo,
               workflow_id: 'publish-npm.yml',
