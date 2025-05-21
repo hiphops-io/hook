@@ -1,9 +1,8 @@
 name: Publish NPM Package
 
 on:
-  push:
-    tags:
-      - "v*" # Run on any tag that starts with 'v', for semver tags like v1.0.0
+  release:
+    types: [published]
 
 jobs:
   build-and-publish:
