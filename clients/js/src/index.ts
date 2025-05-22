@@ -3,7 +3,6 @@ import * as fs from "fs";
 import * as path from "path";
 import * as os from "os";
 import * as http from "http";
-import * as net from "net";
 import { URL } from "url";
 
 // Constants
