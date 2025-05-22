@@ -15,13 +15,13 @@
   "files": [
     "dist",
     "bin",
-    "scripts/install.js"
+    "scripts/install.mjs"
   ],
   "scripts": {
-    "build": "tsup",
+    "build": "echo 'build' && tsup",
     "clean": "rimraf dist",
     "prepublishOnly": "pnpm run clean && pnpm run build",
-    "postinstall": "node scripts/install.js",
+    "postinstall": "node scripts/install.mjs",
     "test": "pnpm run build && node scripts/test.js"
   },
   "keywords": [
