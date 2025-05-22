@@ -79,10 +79,14 @@ const getBinaryPath = (): string => {
 class HookClient {
   private process: ChildProcess | null = null;
   private connectionPromise: Promise<void> | null = null;
-  private isReady = false;
 
   constructor() {
     this.ensureServerRunning();
+
+    // If the parent process exits, kill the hook process
+    process.on("exit", () => {
+      this.process?.kill();
+    });
   }
 
   private ensureServerRunning(): Promise<void> {
@@ -96,8 +100,6 @@ class HookClient {
         const socketExists = fs.existsSync(SOCKET_PATH);
 
         if (socketExists) {
-          // Try to connect to the socket first
-          this.isReady = true;
           resolve();
           return;
         }
@@ -105,26 +107,7 @@ class HookClient {
         // Start the server
         const binaryPath = getBinaryPath();
         this.process = spawn(binaryPath, [], {
-          stdio: ["ignore", "pipe", "pipe"],
-        });
-
-        if (!this.process.stdout || !this.process.stderr) {
-          throw new Error(
-            "Failed to start hook server: stdout or stderr is null"
-          );
-        }
-
-        // Handle process output
-        this.process.stdout.on("data", (data) => {
-          const message = data.toString().trim();
-          if (message.includes("started server")) {
-            this.isReady = true;
-            resolve();
-          }
-        });
-
-        this.process.stderr.on("data", (data) => {
-          console.error(`Hook server error: ${data}`);
+          stdio: ["ignore", "ignore", "ignore"],
         });
 
         this.process.on("error", (err) => {
@@ -132,23 +115,24 @@ class HookClient {
         });
 
         this.process.on("exit", (code) => {
-          if (code !== 0 && !this.isReady) {
+          if (code !== 0)
             reject(new Error(`Hook server exited with code ${code}`));
+        });
+
+        const checkSocket = setInterval(() => {
+          if (fs.existsSync(SOCKET_PATH)) {
+            resolve();
+            clearInterval(checkSocket);
           }
         });
 
-        // Set a timeout for server startup
         setTimeout(() => {
-          if (!this.isReady) {
-            // Check if socket exists anyway
-            if (fs.existsSync(SOCKET_PATH)) {
-              this.isReady = true;
-              resolve();
-            } else {
-              reject(new Error("Timeout waiting for hook server to start"));
-            }
+          clearInterval(checkSocket);
+          if (this.process && !this.process.killed) {
+            this.process.kill();
           }
-        }, 5000);
+          reject(new Error("Timeout waiting for hook server to start"));
+        }, 1000);
       } catch (error) {
         reject(error);
       }
