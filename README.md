@@ -1,13 +1,12 @@
 # Hook
 
-Hook is a helper for delivering on-prem/self-hosted SaaS products.
-Made by the super awesome people at [hiphops.io](https://hiphops.io)
+Hook is the installation side utility for [hiphops.io](https://hiphops.io)
+Hiphops makes it easy to deliver on-prem/self-hosted SaaS products.
 
-> We're wrapping up our first production ready release,
-> this project is not suitable for use _at all_ until v0.1.0
+> This project is not suitable for use _at all_ until v0.1.0
 
-When ready, hook will:
+## Features:
 
-- Add license checks and hooks into the hiphops.io license management stack
-- Add localised observability and crash analytics retention
-- Help smooth installation with pre-flight checks
+- [ ] Add license checks and hooks into the hiphops.io license management stack
+- [ ] Add localised observability and crash analytics retention
+- [ ] Help smooth installation with pre-flight checks
