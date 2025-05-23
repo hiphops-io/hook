@@ -25,7 +25,7 @@ type (
 	}
 )
 
-//go:embed assets/license_key.pem
+//go:embed assets/publickey.pem
 var licenseKey []byte
 var _licenseInfo *LicenseInfo
 

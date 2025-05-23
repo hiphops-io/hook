@@ -33,7 +33,7 @@ func run() error {
 	defer os.Remove(socketPath)
 	defer socket.Close()
 
-	// Pre-warm the license cache
+	// Pre-check the license
 	license.GetLicenseInfo(true)
 
 	sigChan := make(chan os.Signal, 1)
