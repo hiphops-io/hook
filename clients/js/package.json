@@ -1,6 +1,6 @@
 {
   "name": "@hiphops/hook",
-  "version": "0.0.1-alpha23",
+  "version": "0.0.1-alpha24",
   "description": "Client for Hiphops hook",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
