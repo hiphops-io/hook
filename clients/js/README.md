@@ -24,7 +24,7 @@ import { license } from "@hiphops/hook";
 const getLicenseInfo = async () => {
   try {
     const info = await license();
-    if (info.success && info.license.verified) {
+    if (info.verified) {
       console.log("License is valid:", info.license);
     } else {
       console.warn("License verification failed:", info.verify_failures);
@@ -41,21 +41,32 @@ getLicenseInfo();
 
 ### Example result
 
-Given a license with 10 seats, the output will look like this:
+Given a license with `seats` configured as a value and in this case count of 10, the output will look like this:
 
 ```json
 {
-  "success": true,
+  "verified": true,
+  "verify_failures": [],
   "license": {
-    "verified": true,
-    "verify_failures": [],
-    "license": {
-      "seats": 10
-    },
-    "hiphops": {
-      "identity": "c_01jz3b9bz4ka7stedds7g3fjb7",
-      "project_id": "my-project-1234"
-    }
+    "seats": 10
+  },
+  "hiphops": {
+    "identity": "c_01jz3b9bz4ka7stedds7g3fjb7",
+    "project_id": "my-project-1234""
+  }
+}
+```
+
+Failure looks like this:
+
+```json
+{
+  "verified": false,
+  "verify_failures": ["invalid_license_token"],
+  "license": null,
+  "hiphops": {
+    "identity": "",
+    "project_id": ""
   }
 }
 ```

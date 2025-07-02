@@ -11,7 +11,7 @@ app.use(express.json());
 app.get("/health", (req, res) => {
   res.json({
     status: "ok",
-    timestamp: new Date().toISOString()
+    timestamp: new Date().toISOString(),
   });
 });
 
@@ -19,15 +19,12 @@ app.get("/health", (req, res) => {
 app.get("/license", async (req, res) => {
   try {
     const licenseInfo = await license();
-    res.json({
-      success: true,
-      license: licenseInfo
-    });
+    res.json(licenseInfo);
   } catch (error) {
     console.error("License error:", error);
     res.status(500).json({
       success: false,
-      error: error instanceof Error ? error.message : "Unknown error"
+      error: error instanceof Error ? error.message : "Unknown error",
     });
   }
 });

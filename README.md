@@ -17,7 +17,7 @@ import { license } from "@hiphops/hook";
 const getLicenseInfo = async () => {
   try {
     const info = await license();
-    if (info.success && info.license.verified) {
+    if (info.verified) {
       console.log("License is valid:", info.license);
     } else {
       console.warn("License verification failed:", info.verify_failures);
