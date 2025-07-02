@@ -11,7 +11,7 @@ npm install @hiphops/hook
 ```
 
 ```javascript
-import { Hook } from '@hiphops/hook';
+import { Hook } from "@hiphops/hook";
 
 const hook = new Hook();
 // Your hook integration code here
@@ -33,14 +33,13 @@ The JavaScript client provides a robust interface for working with Hook in Node.
 ### Coming Soon
 
 - **Python Client**: Python bindings for Hook integration
-- **Go Client**: Native Go SDK for Hook services
 - **REST API**: Direct HTTP interface for any language
 
 ## 🛠 Development
 
 ### Architecture
 
-This repository contains only the client libraries and public-facing documentation. The core Hook binary is built from a separate private repository and automatically packaged with these clients during the release process.
+This repository contains only the client libraries and public-facing documentation. The core Hook binary is automatically packaged with these clients during the release process.
 
 ### Contributing
 
@@ -62,7 +61,6 @@ cd hook
 # JavaScript client development
 cd clients/js
 npm install
-npm run build
 npm test
 ```
 
@@ -80,10 +78,6 @@ Client libraries are automatically built and published when new versions of Hook
 - **Node.js**: 18+ (for JavaScript client)
 - **Python**: 3.8+ (for Python client, when available)
 - **Operating Systems**: macOS, Linux, Windows
-
-## 📄 License
-
-[Add your license information here]
 
 ## 🆘 Support
 
