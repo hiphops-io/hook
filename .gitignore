@@ -47,3 +47,5 @@ temp/
 
 # Hook binaries (will be managed by release process)
 clients/*/bin/
+
+package-lock.json
