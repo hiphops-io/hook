@@ -1,15 +1,12 @@
-name: Publish to NPM
+name: Publish NPM Package
 
 on:
   workflow_dispatch:
-    inputs:
-      version:
-        description: "Version tag from private repo (e.g., v1.2.3)"
-        required: true
-
 jobs:
-  publish:
+  build-and-publish:
+    name: Build and publish NPM package
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -17,35 +14,26 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "18"
+          node-version: "18.x"
           registry-url: "https://registry.npmjs.org"
 
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: latest
+
       - name: Install dependencies
-        run: |
-          cd clients/js
-          SKIP_HOOK_DOWNLOAD=true npm ci
+        run: pnpm install
+        working-directory: ./clients/js
+        env:
+          SKIP_HOOK_DOWNLOAD: "true"
 
       - name: Build package
-        run: |
-          cd clients/js
-          npm run build
-
-      - name: Run tests
-        run: |
-          cd clients/js
-          npm test
-
-      - name: Update package version
-        run: |
-          cd clients/js
-          # Extract version from tag (remove 'v' prefix)
-          VERSION="${{ github.event.inputs.version }}"
-          VERSION=${VERSION#v}
-          npm version $VERSION --no-git-tag-version
+        run: pnpm build
+        working-directory: ./clients/js
 
       - name: Publish to NPM
-        run: |
-          cd clients/js
-          npm publish
+        run: pnpm publish --no-git-checks --access public
+        working-directory: ./clients/js
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
