@@ -18,29 +18,55 @@ yarn add @hiphops/hook
 ## Usage
 
 ```typescript
-import { license } from '@hiphops/hook';
+import { license } from "@hiphops/hook";
 
 // Get license information
 const getLicenseInfo = async () => {
   try {
     const info = await license();
-    console.log('License info:', info);
+    if (info.success && info.license.verified) {
+      console.log("License is valid:", info.license);
+    } else {
+      console.warn("License verification failed:", info.verify_failures);
+    }
+    console.log("License info:", info);
     return info;
   } catch (error) {
-    console.error('Error getting license info:', error);
+    console.error("Error getting license info:", error);
   }
 };
 
 getLicenseInfo();
 ```
 
+### Example result
+
+Given a license with 10 seats, the output will look like this:
+
+```json
+{
+  "success": true,
+  "license": {
+    "verified": true,
+    "verify_failures": [],
+    "license": {
+      "seats": 10
+    },
+    "hiphops": {
+      "identity": "c_01jz3b9bz4ka7stedds7g3fjb7",
+      "project_id": "my-project-1234"
+    }
+  }
+}
+```
+
 ## Custom Binary Path
 
-If you want to use a custom hook binary, set the `HIPHOPS_HOOK_BIN` environment variable:
+Hook automatically manages the binary which checks license keys for you, but if you need to use a custom binary, you can specify its path using the `HIPHOPS_HOOK_BIN` environment variable.
 
 ```bash
 # Set the environment variable
-export HIPHOPS_HOOK_BIN=/path/to/custom/hook
+export HIPHOPS_HOOK_BIN=/path/to/custom/hook-binary
 
 # Then use the package normally
 node your-script.js
@@ -53,7 +79,3 @@ This package is designed to work with:
 - Node.js (16+)
 - Deno (via npm compatibility)
 - Bun
-
-## License
-
-MIT

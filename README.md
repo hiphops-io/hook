@@ -11,10 +11,25 @@ npm install @hiphops/hook
 ```
 
 ```javascript
-import { Hook } from "@hiphops/hook";
+import { license } from "@hiphops/hook";
 
-const hook = new Hook();
-// Your hook integration code here
+// Get license information
+const getLicenseInfo = async () => {
+  try {
+    const info = await license();
+    if (info.success && info.license.verified) {
+      console.log("License is valid:", info.license);
+    } else {
+      console.warn("License verification failed:", info.verify_failures);
+    }
+    console.log("License info:", info);
+    return info;
+  } catch (error) {
+    console.error("Error getting license info:", error);
+  }
+};
+
+getLicenseInfo();
 ```
 
 ## 📚 Available Clients
@@ -34,6 +49,14 @@ The JavaScript client provides a robust interface for working with Hook in Node.
 
 - **Python Client**: Python bindings for Hook integration
 - **REST API**: Direct HTTP interface for any language
+
+## 📝 Examples
+
+Find ready-to-run examples for each client in the `examples/` directory:
+
+- 📦 JavaScript/TypeScript: `examples/js`
+
+🗂️ [Browse all examples](https://github.com/hiphops-io/hook/tree/main/examples)
 
 ## 🛠 Development
 
