@@ -1,0 +1,53 @@
+{
+  "name": "@hiphops/hook",
+  "version": "0.0.1-alpha20",
+  "description": "Client for Hiphops hook",
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "require": "./dist/index.js",
+      "import": "./dist/index.mjs"
+    }
+  },
+  "files": [
+    "dist",
+    "bin",
+    "scripts/install.mjs"
+  ],
+  "scripts": {
+    "build": "echo 'build' && tsup",
+    "clean": "rimraf dist",
+    "prepublishOnly": "pnpm run clean && pnpm run build",
+    "postinstall": "node scripts/install.mjs",
+    "test": "pnpm run build && node scripts/test.js"
+  },
+  "keywords": [
+    "hiphops",
+    "hook"
+  ],
+  "author": "hiphops.io",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hiphops-io/hook.git"
+  },
+  "bugs": {
+    "url": "https://github.com/hiphops-io/hook/issues"
+  },
+  "homepage": "https://github.com/hiphops-io/hook#readme",
+  "engines": {
+    "node": ">=16"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "rimraf": "^5.0.5",
+    "tsup": "^8.0.1",
+    "typescript": "^5.3.3"
+  },
+  "dependencies": {
+    "http-parser-js": "^0.5.8"
+  }
+}
