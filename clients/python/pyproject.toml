@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "hiphops-hook"
-version = "0.0.1-alpha28"
+version = "0.0.1-alpha29"
 description = "Python client for HipHops Hook"
 readme = "README.md"
 license = {text = "MIT"}
