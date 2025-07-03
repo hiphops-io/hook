@@ -43,7 +43,7 @@ dev = [
 ]
 
 [project.scripts]
-hiphops-hook-install = "scripts.install:main"
+hiphops-hook-install = "hiphops_hook.scripts.install:main"
 
 [tool.setuptools.packages.find]
 where = ["."]

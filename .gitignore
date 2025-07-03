@@ -49,3 +49,6 @@ temp/
 clients/*/bin/
 
 package-lock.json
+
+CLAUDE.md
+.claude/
