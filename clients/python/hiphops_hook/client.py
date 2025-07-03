@@ -47,7 +47,7 @@ class HookClient:
         """Initialize the Hook client."""
         self._process: Optional[subprocess.Popen] = None
         self._connection_promise: Optional[bool] = None
-        self._package_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        self._package_dir = os.path.dirname(os.path.abspath(__file__))
 
         # Register cleanup function
         atexit.register(self._cleanup)

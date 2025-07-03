@@ -1,2 +1,0 @@
-[console_scripts]
-hiphops-hook-install = scripts.install:main

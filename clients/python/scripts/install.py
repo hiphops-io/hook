@@ -22,9 +22,8 @@ from hiphops_hook.exceptions import DownloadError
 
 def get_version() -> str:
     """Get the package version."""
-    # In a real implementation, this would read from setup.py or pyproject.toml
-    # For now, we'll use a hardcoded version that matches the TypeScript client
-    return "0.0.1-alpha26"
+    # This version is automatically updated by the release script
+    return "0.0.1-alpha27"
 
 
 def download_binary() -> None:
@@ -46,8 +45,9 @@ def download_binary() -> None:
         binary_name = get_binary_name()
 
         # Create bin directory if it doesn't exist
-        script_dir = Path(__file__).parent
-        package_dir = script_dir.parent
+        # When called from setup.py, we need to find the hiphops_hook package directory
+        import hiphops_hook
+        package_dir = Path(hiphops_hook.__file__).parent
         bin_dir = package_dir / "bin"
         bin_dir.mkdir(exist_ok=True)
 

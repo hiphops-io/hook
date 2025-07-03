@@ -22,16 +22,9 @@ class PostInstallCommand(install):
     def _post_install(self):
         """Run post-installation tasks."""
         try:
-            # Run the binary download script
-            script_path = Path(__file__).parent / "scripts" / "install.py"
-            if script_path.exists():
-                import subprocess
-
-                result = subprocess.run(
-                    [sys.executable, str(script_path)], capture_output=True, text=True
-                )
-                if result.returncode != 0:
-                    print(f"Warning: Binary download failed: {result.stderr}")
+            # Import and run the binary download function directly
+            from hiphops_hook.scripts.install import download_binary
+            download_binary()
         except Exception as e:
             print(f"Warning: Post-install hook failed: {e}")
 
@@ -46,16 +39,9 @@ class PostDevelopCommand(develop):
     def _post_install(self):
         """Run post-installation tasks."""
         try:
-            # Run the binary download script
-            script_path = Path(__file__).parent / "scripts" / "install.py"
-            if script_path.exists():
-                import subprocess
-
-                result = subprocess.run(
-                    [sys.executable, str(script_path)], capture_output=True, text=True
-                )
-                if result.returncode != 0:
-                    print(f"Warning: Binary download failed: {result.stderr}")
+            # Import and run the binary download function directly
+            from hiphops_hook.scripts.install import download_binary
+            download_binary()
         except Exception as e:
             print(f"Warning: Post-install hook failed: {e}")
 
