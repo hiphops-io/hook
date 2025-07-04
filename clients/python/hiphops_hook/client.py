@@ -84,11 +84,21 @@ class HookClient:
                 self._connection_promise = True
                 return
 
-            # Get binary path
+            # Get binary path - try to download if not found
             try:
                 binary_path = get_binary_path(self._package_dir, BINARY_ENV_VAR)
             except FileNotFoundError as e:
-                raise BinaryNotFoundError(str(e))
+                # Try to download the binary automatically
+                logger.debug("[Hook] Binary not found, attempting to download...")
+                try:
+                    from .scripts.install import download_binary
+                    download_binary()
+                    # Try again after download
+                    binary_path = get_binary_path(self._package_dir, BINARY_ENV_VAR)
+                    logger.debug(f"[Hook] Binary downloaded successfully to: {binary_path}")
+                except Exception as download_error:
+                    logger.debug(f"[Hook] Binary download failed: {download_error}")
+                    raise BinaryNotFoundError(f"Hook binary not found and download failed: {e}. Original error: {download_error}")
 
             # Start the server
             logger.debug("[Hook] Starting hook server...")
