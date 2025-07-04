@@ -42,8 +42,6 @@ dev = [
     "mypy>=0.900"
 ]
 
-[project.scripts]
-hiphops-hook-install = "hiphops_hook.scripts.install:main"
 
 [tool.setuptools.packages.find]
 where = ["."]
@@ -51,3 +49,6 @@ include = ["hiphops_hook*"]
 
 [tool.setuptools.package-data]
 hiphops_hook = ["bin/*"]
+
+[tool.cibuildwheel]
+before-build = "python scripts/download_binary_for_build.py"

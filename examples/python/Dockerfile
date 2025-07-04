@@ -7,7 +7,7 @@ WORKDIR /app
 # Copy requirements file
 COPY requirements.txt .
 
-# Install dependencies
+# Install dependencies (binaries are now embedded in wheels)
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy source code
