@@ -16,7 +16,7 @@ from .exceptions import (
 )
 from .platform_utils import get_binary_name, get_binary_path, get_platform_info
 
-__version__ = "0.0.1-alpha30"
+__version__ = "0.0.1-alpha31"
 __all__ = [
     # Main client and functions
     "HookClient",
