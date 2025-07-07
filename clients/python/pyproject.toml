@@ -51,4 +51,4 @@ include = ["hiphops_hook*"]
 hiphops_hook = ["bin/*"]
 
 [tool.cibuildwheel]
-before-build = "python {project}/scripts/download_binary_for_build.py"
+before-build = "python {package}/scripts/download_binary_for_build.py"
