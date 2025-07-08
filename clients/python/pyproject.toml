@@ -52,4 +52,6 @@ hiphops_hook = ["bin/*"]
 [tool.cibuildwheel]
 before-build = "python {package}/scripts/download_binary_for_build.py"
 build = "cp312-*"
+
+[tool.cibuildwheel.linux]
 repair-wheel-command = "python scripts/repair_wheel.py {wheel} {dest_dir}"
