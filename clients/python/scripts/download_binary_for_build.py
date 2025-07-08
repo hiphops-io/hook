@@ -22,13 +22,13 @@ def get_binary_name_from_cibw():
     # Detect platform using Python's platform module
     system = platform_module.system().lower()
 
-    print(f"🔍 System: {system}")
-    print(f"🔍 CIBW_ARCHS: {archs}")
+    print(f"System: {system}")
+    print(f"CIBW_ARCHS: {archs}")
 
     # If CIBW_ARCHS is not set, try to detect from machine architecture
     if not archs:
         machine = platform_module.machine().lower()
-        print(f"🔍 Machine: {machine}")
+        print(f"Machine: {machine}")
         if machine in ["x86_64", "amd64"]:
             archs = "x86_64"
         elif machine in ["arm64", "aarch64"]:
@@ -81,8 +81,8 @@ def download_binary():
         binary_name = get_binary_name_from_cibw()
         version = get_version()
 
-        print(f"📦 Package version: {version}")
-        print(f"🔍 Binary name: {binary_name}")
+        print(f"Package version: {version}")
+        print(f"Binary name: {binary_name}")
 
         # Create bin directory in package
         script_dir = Path(__file__).parent
@@ -95,8 +95,8 @@ def download_binary():
         # Download URL
         download_url = f"https://github.com/hiphops-io/hook/releases/download/v{version}/{binary_name}"
 
-        print(f"📥 Downloading from: {download_url}")
-        print(f"💾 Saving to: {binary_path}")
+        print(f"Downloading from: {download_url}")
+        print(f"Saving to: {binary_path}")
 
         # Try to download with SSL verification first, fallback to no verification
         response = None
@@ -107,7 +107,7 @@ def download_binary():
         except urllib.error.URLError as e:
             if "certificate verify failed" in str(e):
                 print(
-                    "⚠️  SSL certificate verification failed, retrying without verification..."
+                    "WARNING: SSL certificate verification failed, retrying without verification..."
                 )
                 # Create unverified SSL context as fallback
                 ssl_context = ssl.create_default_context()
@@ -133,15 +133,15 @@ def download_binary():
             current_mode = binary_path.stat().st_mode
             binary_path.chmod(current_mode | stat.S_IEXEC)
 
-        print(f"✅ Successfully downloaded binary to {binary_path}")
-        print(f"📊 Binary size: {binary_path.stat().st_size} bytes")
+        print(f"Successfully downloaded binary to {binary_path}")
+        print(f"Binary size: {binary_path.stat().st_size} bytes")
 
     except Exception as e:
-        print(f"❌ Error during binary download: {e}", file=sys.stderr)
+        print(f"Error during binary download: {e}", file=sys.stderr)
         sys.exit(1)
 
 
 if __name__ == "__main__":
-    print("🚀 Starting cibuildwheel binary download...")
+    print("Starting cibuildwheel binary download...")
     download_binary()
-    print("🎉 Binary download completed successfully!")
+    print("Binary download completed successfully!")
