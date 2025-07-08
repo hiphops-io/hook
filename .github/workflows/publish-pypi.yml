@@ -2,6 +2,7 @@ name: Publish PyPI Package
 
 on:
   workflow_dispatch:
+  workflow_call:
 
 jobs:
   build_wheels:
@@ -12,52 +13,52 @@ jobs:
         include:
           # Linux builds (both architectures)
           - os: ubuntu-latest
-            archs: x86_64 aarch64
+            archs: [x86_64, aarch64]
           # macOS builds (both architectures)
           - os: macos-latest
-            archs: x86_64 arm64
+            archs: [x86_64, arm64]
           # Windows
           - os: windows-latest
             archs: AMD64
 
     steps:
-    - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-    - name: Build wheels
-      uses: pypa/cibuildwheel@v2.16.5
-      env:
-        CIBW_ARCHS: ${{ matrix.archs }}
-      with:
-        package-dir: clients/python
+      - name: Build wheels
+        uses: pypa/cibuildwheel@v3.0.1
+        env:
+          CIBW_ARCHS: ${{ matrix.archs }}
+        with:
+          package-dir: clients/python
 
-    - name: Upload wheels
-      uses: actions/upload-artifact@v4
-      with:
-        name: cibw-wheels-${{ matrix.os }}-${{ strategy.job-index }}
-        path: ./wheelhouse/*.whl
+      - name: Upload wheels
+        uses: actions/upload-artifact@v4
+        with:
+          name: cibw-wheels-${{ matrix.os }}-${{ strategy.job-index }}
+          path: ./wheelhouse/*.whl
 
   build_sdist:
     name: Build source distribution
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-    - name: Setup Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: "3.10"
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.12"
 
-    - name: Build sdist
-      run: |
-        python -m pip install --upgrade pip build
-        python -m build --sdist
-      working-directory: ./clients/python
+      - name: Build sdist
+        run: |
+          python -m pip install --upgrade pip build
+          python -m build --sdist
+        working-directory: ./clients/python
 
-    - name: Upload sdist
-      uses: actions/upload-artifact@v4
-      with:
-        name: cibw-sdist
-        path: clients/python/dist/*.tar.gz
+      - name: Upload sdist
+        uses: actions/upload-artifact@v4
+        with:
+          name: cibw-sdist
+          path: clients/python/dist/*.tar.gz
 
   pypi-publish:
     name: Publish to PyPI
@@ -67,12 +68,12 @@ jobs:
       id-token: write
 
     steps:
-    - name: Download all artifacts
-      uses: actions/download-artifact@v4
-      with:
-        pattern: cibw-*
-        path: dist
-        merge-multiple: true
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: cibw-*
+          path: dist
+          merge-multiple: true
 
-    - name: Publish to PyPI
-      uses: pypa/gh-action-pypi-publish@release/v1
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1

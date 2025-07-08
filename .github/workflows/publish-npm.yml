@@ -2,6 +2,7 @@ name: Publish NPM Package
 
 on:
   workflow_dispatch:
+  workflow_call:
 jobs:
   build-and-publish:
     name: Build and publish NPM package

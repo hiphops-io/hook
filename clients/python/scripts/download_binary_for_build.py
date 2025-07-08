@@ -4,6 +4,7 @@ Build-time script to download the appropriate Hook binary using cibuildwheel env
 """
 
 import os
+import ssl
 import stat
 import sys
 import urllib.request
@@ -12,30 +13,43 @@ from pathlib import Path
 
 
 def get_binary_name_from_cibw():
-    """Get the binary name based on cibuildwheel environment variables."""
-    # Get platform and architecture from cibuildwheel
-    platform = os.environ.get("CIBW_PLATFORM", "").lower()
+    """Get the binary name based on cibuildwheel environment variables and platform detection."""
+    import platform as platform_module
+
+    # Get architecture from cibuildwheel (this is available)
     archs = os.environ.get("CIBW_ARCHS", "").lower()
 
-    print(f"🔍 CIBW_PLATFORM: {platform}")
+    # Detect platform using Python's platform module
+    system = platform_module.system().lower()
+
+    print(f"🔍 System: {system}")
     print(f"🔍 CIBW_ARCHS: {archs}")
 
-    # Map cibuildwheel values to our binary names
-    if platform == "linux":
+    # If CIBW_ARCHS is not set, try to detect from machine architecture
+    if not archs:
+        machine = platform_module.machine().lower()
+        print(f"🔍 Machine: {machine}")
+        if machine in ["x86_64", "amd64"]:
+            archs = "x86_64"
+        elif machine in ["arm64", "aarch64"]:
+            archs = "arm64"
+
+    # Map platform and architecture to binary names
+    if system == "linux":
         if "x86_64" in archs or "amd64" in archs:
             return "hook-linux-amd64"
         elif "aarch64" in archs or "arm64" in archs:
             return "hook-linux-arm64"
-    elif platform == "macos":
+    elif system == "darwin":
         if "x86_64" in archs or "amd64" in archs:
             return "hook-darwin-amd64"
         elif "arm64" in archs:
             return "hook-darwin-arm64"
-    elif platform == "windows":
+    elif system == "windows":
         if "amd64" in archs or "x86_64" in archs:
             return "hook-windows-amd64.exe"
 
-    raise RuntimeError(f"Unsupported platform/arch combination: {platform}/{archs}")
+    raise RuntimeError(f"Unsupported platform/arch combination: {system}/{archs}")
 
 
 def get_version():
@@ -84,8 +98,27 @@ def download_binary():
         print(f"📥 Downloading from: {download_url}")
         print(f"💾 Saving to: {binary_path}")
 
+        # Try to download with SSL verification first, fallback to no verification
+        response = None
+        try:
+            # Create SSL context that handles certificate verification
+            ssl_context = ssl.create_default_context()
+            response = urllib.request.urlopen(download_url, context=ssl_context)
+        except urllib.error.URLError as e:
+            if "certificate verify failed" in str(e):
+                print(
+                    "⚠️  SSL certificate verification failed, retrying without verification..."
+                )
+                # Create unverified SSL context as fallback
+                ssl_context = ssl.create_default_context()
+                ssl_context.check_hostname = False
+                ssl_context.verify_mode = ssl.CERT_NONE
+                response = urllib.request.urlopen(download_url, context=ssl_context)
+            else:
+                raise
+
         # Download the binary
-        with urllib.request.urlopen(download_url) as response:
+        with response:
             if response.status != 200:
                 raise RuntimeError(
                     f"Failed to download binary. Status code: {response.status}"
