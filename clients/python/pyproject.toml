@@ -55,3 +55,7 @@ build = "cp312-*"
 
 [tool.cibuildwheel.linux]
 repair-wheel-command = "python {package}/scripts/repair_wheel.py {wheel} {dest_dir}"
+
+[tool.cibuildwheel.macos]
+repair-wheel-command = "cp {wheel} {dest_dir}"
+environment = "MACOSX_DEPLOYMENT_TARGET=11.0"
