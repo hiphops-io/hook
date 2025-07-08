@@ -52,14 +52,4 @@ hiphops_hook = ["bin/*"]
 [tool.cibuildwheel]
 before-build = "python {package}/scripts/download_binary_for_build.py"
 build = "cp312-*"
-repair-wheel-command = "python -c \"
-import shutil, sys, os
-wheel_path = sys.argv[1]
-dest_dir = sys.argv[2]
-wheel_name = os.path.basename(wheel_path)
-# Replace linux_x86_64 with manylinux_2_17_x86_64
-new_name = wheel_name.replace('linux_x86_64', 'manylinux_2_17_x86_64')
-new_path = os.path.join(dest_dir, new_name)
-shutil.copy2(wheel_path, new_path)
-print(f'Renamed wheel to: {new_name}')
-\" {wheel} {dest_dir}"
+repair-wheel-command = "python scripts/repair_wheel.py {wheel} {dest_dir}"
