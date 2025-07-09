@@ -23,7 +23,7 @@ from hiphops_hook.exceptions import DownloadError
 def get_version() -> str:
     """Get the package version."""
     # This version is automatically updated by the release script
-    return "0.0.1-alpha33"
+    return "0.0.1-alpha34"
 
 
 def download_binary() -> None:
