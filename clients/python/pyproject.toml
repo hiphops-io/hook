@@ -54,7 +54,7 @@ before-build = "python {package}/scripts/download_binary_for_build.py"
 build = "cp312-*"
 
 [tool.cibuildwheel.linux]
-repair-wheel-command = "mkdir -p {dest_dir} && cp {wheel} {dest_dir}/$(basename {wheel} | sed 's/linux_x86_64/manylinux_2_17_x86_64/')"
+repair-wheel-command = "mkdir -p {dest_dir} && cp {wheel} {dest_dir}/$(basename {wheel} | sed 's/linux_x86_64/manylinux_2_17_x86_64/' | sed 's/linux_aarch64/manylinux_2_17_aarch64/')"
 
 [tool.cibuildwheel.macos]
 repair-wheel-command = "cp {wheel} {dest_dir}"
