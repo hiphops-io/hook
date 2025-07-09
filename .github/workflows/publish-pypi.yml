@@ -14,8 +14,8 @@ jobs:
           # Linux x86_64
           - os: ubuntu-latest
             archs: "x86_64"
-          # Linux ARM64
-          - os: ubuntu-latest
+          # Linux ARM64 (native runner)
+          - os: ubuntu-24.04-arm64
             archs: "aarch64"
           # macOS Intel
           - os: macos-latest
