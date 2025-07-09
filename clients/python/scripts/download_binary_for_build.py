@@ -17,13 +17,13 @@ def get_binary_name_from_cibw():
     import platform as platform_module
 
     # Get architecture from cibuildwheel (this is available)
-    archs = os.environ.get("CIBW_ARCHS", "").lower()
+    archs = os.environ.get("CIBW_ARCHS", "").lower().strip()
 
     # Detect platform using Python's platform module
     system = platform_module.system().lower()
 
     print(f"System: {system}")
-    print(f"CIBW_ARCHS: {archs}")
+    print(f"CIBW_ARCHS: '{archs}'")
 
     # If CIBW_ARCHS is not set, try to detect from machine architecture
     if not archs:
@@ -36,17 +36,17 @@ def get_binary_name_from_cibw():
 
     # Map platform and architecture to binary names
     if system == "linux":
-        if "x86_64" in archs or "amd64" in archs:
+        if archs in ["x86_64", "amd64"]:
             return "hook-linux-amd64"
-        elif "aarch64" in archs or "arm64" in archs:
+        elif archs in ["aarch64", "arm64"]:
             return "hook-linux-arm64"
     elif system == "darwin":
-        if "x86_64" in archs or "amd64" in archs:
+        if archs in ["x86_64", "amd64"]:
             return "hook-darwin-amd64"
-        elif "arm64" in archs:
+        elif archs in ["arm64"]:
             return "hook-darwin-arm64"
     elif system == "windows":
-        if "amd64" in archs or "x86_64" in archs:
+        if archs in ["amd64", "x86_64"]:
             return "hook-windows-amd64.exe"
 
     raise RuntimeError(f"Unsupported platform/arch combination: {system}/{archs}")

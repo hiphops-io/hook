@@ -6,18 +6,21 @@ on:
 
 jobs:
   build_wheels:
-    name: Build wheels on ${{ matrix.os }}
+    name: Build wheels on ${{ matrix.os }} (${{ matrix.archs }})
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         include:
-          # Linux builds (x86_64 only - native arch)
+          # Linux builds
           - os: ubuntu-latest
             archs: "x86_64"
-          # macOS builds (both archs - macOS runners support both)
+          # macOS Intel
           - os: macos-latest
-            archs: "x86_64 arm64"
-          # Windows (x86_64 only - native arch)
+            archs: "x86_64"
+          # macOS Apple Silicon
+          - os: macos-latest
+            archs: "arm64"
+          # Windows
           - os: windows-latest
             archs: "AMD64"
 
