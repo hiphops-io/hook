@@ -68,7 +68,7 @@ def get_binary_path(package_dir: str, env_var: str = "HIPHOPS_HOOK_BIN") -> str:
         Path to the Hook binary
 
     Raises:
-        FileNotFoundError: If binary is not found
+        FileNotFoundError: If binary is not found and cannot be downloaded
     """
     # Check if env var is set
     env_binary_path = os.environ.get(env_var)
@@ -84,7 +84,26 @@ def get_binary_path(package_dir: str, env_var: str = "HIPHOPS_HOOK_BIN") -> str:
     binary_path = os.path.join(package_dir, "bin", binary_name)
 
     if not os.path.exists(binary_path):
-        raise FileNotFoundError(f"Hook binary not found at: {binary_path}")
+        # Try to download the binary automatically
+        try:
+            from .scripts.download import download_binary
+
+            print("Hook binary not found, downloading automatically...")
+            download_binary()
+
+            # Check again after download
+            if os.path.exists(binary_path):
+                return binary_path
+            else:
+                raise FileNotFoundError(
+                    f"Hook binary not found at: {binary_path} (download may have failed)"
+                )
+        except Exception as e:
+            raise FileNotFoundError(
+                f"Hook binary not found at: {binary_path}. "
+                f"Automatic download failed: {e}. "
+                f"You may need to install from a wheel or check your internet connection."
+            )
 
     return binary_path
 
